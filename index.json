@@ -8,5 +8,10 @@
     "name": "openai-whisper",
     "description": "Transcribe audio files using OpenAI Whisper / GPT-4o transcription. Supports mp3, mp4, m4a, wav, webm with multiple models and output formats including subtitles (srt, vtt).",
     "auth": "api_key"
+  },
+  {
+    "name": "gemini-vision",
+    "description": "Analyze and understand images using Gemini 2.5 Flash. Describe photos, read text from screenshots (OCR), analyze charts, review UI mockups. Supports png, jpg, webp, heic, heif.",
+    "auth": "api_key"
   }
 ]
