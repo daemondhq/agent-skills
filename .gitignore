@@ -1,0 +1,4 @@
+.test/
+.wip/
+node_modules/
+.env*
