@@ -2,16 +2,19 @@
   {
     "name": "nano-banana-all",
     "description": "Generate and edit images using Google's Nano Banana models (Gemini image generation). Supports versions 1, 1-pro, and 2 with text-to-image, image-to-image editing, and 1K/2K/4K resolution.",
-    "auth": "api_key"
+    "auth": "api_key",
+    "auth_env": "GEMINI_API_KEY"
   },
   {
     "name": "openai-whisper",
     "description": "Transcribe audio files using OpenAI Whisper / GPT-4o transcription. Supports mp3, mp4, m4a, wav, webm with multiple models and output formats including subtitles (srt, vtt).",
-    "auth": "api_key"
+    "auth": "api_key",
+    "auth_env": "OPENAI_API_KEY"
   },
   {
     "name": "gemini-vision",
     "description": "Analyze and understand images using Gemini 2.5 Flash. Describe photos, read text from screenshots (OCR), analyze charts, review UI mockups. Supports png, jpg, webp, heic, heif.",
-    "auth": "api_key"
+    "auth": "api_key",
+    "auth_env": "GEMINI_API_KEY"
   }
 ]
