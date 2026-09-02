@@ -1,6 +1,6 @@
 ---
 name: nano-banana-all
-description: Generate/edit images with Nano Banana (Gemini image generation). Supports versions 1, 1-pro, and 2. Use for image create/modify requests incl. edits. Supports text-to-image + image-to-image; 1K/2K/4K; use --input-image and --version.
+description: Generate/edit images with Nano Banana using Gemini by default or Atlas Cloud as an explicit opt-in provider. Supports versions 1, 1-pro, and 2. Use for image create/modify requests incl. edits. Supports text-to-image + image-to-image; 1K/2K/4K; use --input-image and --version.
 ---
 
 # Nano Banana Image Generation & Editing
@@ -12,6 +12,7 @@ Generate new images or edit existing ones using Google's Nano Banana models.
 - Verify `uv` is installed: `uv --version`
   - If missing: `curl -LsSf https://astral.sh/uv/install.sh | sh` (macOS/Linux) or `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"` (Windows)
 - Verify API key: `GEMINI_API_KEY` env var must be set (or pass `--api-key`)
+- Optional Atlas Cloud route: set `ATLASCLOUD_API_KEY` and pass `--provider atlas`
 - If editing: verify input image exists at the given path
 
 ## Usage
@@ -29,6 +30,25 @@ uv run /home/agent/skills/nano-banana-all/scripts/generate_image.py --prompt "ed
 ```
 
 **Important:** Always run from the user's current working directory so images are saved where the user is working, not in the skill directory.
+
+### Optional Atlas Cloud provider
+
+Gemini remains the default. Atlas Cloud Nano Banana 2 can be selected explicitly for both
+generation and editing:
+
+```bash
+export ATLASCLOUD_API_KEY="your-atlas-key"
+
+uv run /home/agent/skills/nano-banana-all/scripts/generate_image.py \
+  --provider atlas \
+  --prompt "A precise exploded-view diagram of a camera" \
+  --filename "camera-diagram.png" \
+  --resolution 2K
+```
+
+For editing, add `--input-image` as in the Gemini examples. The Atlas route discovers the live
+model catalog and input schema before each generation, uploads a local edit source once, and makes
+each paid generation POST exactly once. Only read-only prediction GETs receive bounded retries.
 
 ## Model Versions
 
@@ -75,6 +95,9 @@ The script checks for API key in this order:
 2. `GEMINI_API_KEY` environment variable
 
 If neither is available, the script exits with an error message.
+
+With `--provider atlas`, the script reads `ATLASCLOUD_API_KEY` from the environment. It does not
+accept the Atlas key as a command-line argument, which keeps it out of process listings.
 
 ## Common Failures
 
