@@ -4,6 +4,7 @@
 # dependencies = [
 #     "google-genai>=1.0.0",
 #     "pillow>=10.0.0",
+#     "requests>=2.32.0",
 # ]
 # ///
 """
@@ -69,17 +70,63 @@ def main():
         "--api-key", "-k",
         help="Gemini API key (overrides GEMINI_API_KEY env var)"
     )
+    parser.add_argument(
+        "--provider",
+        choices=["gemini", "atlas"],
+        default="gemini",
+        help="Image provider: gemini (default) or atlas"
+    )
 
     args = parser.parse_args()
 
-    # Get API key
-    api_key = get_api_key(args.api_key)
+    # Atlas is opt-in and reads its key only from the environment.
+    api_key = (
+        os.environ.get("ATLASCLOUD_API_KEY")
+        if args.provider == "atlas"
+        else get_api_key(args.api_key)
+    )
     if not api_key:
         print("Error: No API key provided.", file=sys.stderr)
-        print("Please either:", file=sys.stderr)
-        print("  1. Provide --api-key argument", file=sys.stderr)
-        print("  2. Set GEMINI_API_KEY environment variable", file=sys.stderr)
+        if args.provider == "atlas":
+            print(
+                "Set ATLASCLOUD_API_KEY before using --provider atlas.",
+                file=sys.stderr,
+            )
+        else:
+            print("Please either:", file=sys.stderr)
+            print("  1. Provide --api-key argument", file=sys.stderr)
+            print("  2. Set GEMINI_API_KEY environment variable", file=sys.stderr)
         sys.exit(1)
+
+    output_path = Path(args.filename)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    if args.provider == "atlas":
+        from io import BytesIO
+
+        from PIL import Image as PILImage
+
+        from atlas_provider import AtlasImageProvider
+
+        input_path = Path(args.input_image) if args.input_image else None
+        if input_path and not input_path.is_file():
+            print(f"Error loading input image: file not found: {input_path}", file=sys.stderr)
+            sys.exit(1)
+        try:
+            action = "Editing" if input_path else "Generating"
+            print(f"{action} image with Atlas Cloud Nano Banana 2...")
+            image_data = AtlasImageProvider(api_key).generate(
+                args.prompt,
+                input_image=input_path,
+                resolution=args.resolution,
+            )
+            image = PILImage.open(BytesIO(image_data)).convert("RGB")
+            image.save(str(output_path), "PNG")
+            print(f"\nImage saved: {output_path.resolve()}")
+            return
+        except Exception as e:
+            print(f"Error generating image: {e}", file=sys.stderr)
+            sys.exit(1)
 
     # Import here after checking API key to avoid slow import on error
     from google import genai
@@ -88,10 +135,6 @@ def main():
 
     # Initialise client
     client = genai.Client(api_key=api_key)
-
-    # Set up output path
-    output_path = Path(args.filename)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
 
     # Load input image if provided
     input_image = None

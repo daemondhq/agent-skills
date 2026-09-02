@@ -6,7 +6,7 @@ A collection of skills that extend AI agents with multimodal capabilities — im
 
 | Skill | Description | Auth |
 |---|---|---|
-| **nano-banana-all** | Generate and edit images using Google's Nano Banana models (versions 1, 1-pro, 2) | `GEMINI_API_KEY` |
+| **nano-banana-all** | Generate and edit images using Nano Banana; Gemini is the default and Atlas Cloud is opt-in | `GEMINI_API_KEY` / `ATLASCLOUD_API_KEY` |
 | **openai-whisper** | Transcribe audio files using OpenAI Whisper / GPT-4o | `OPENAI_API_KEY` |
 | **gemini-vision** | Analyze and understand images using Gemini 2.5 Flash | `GEMINI_API_KEY` |
 
